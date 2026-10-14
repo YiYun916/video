@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>鲸鱼影视</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+<style>
+:root{
+  --bg:#0b0e14; --bg2:#11151f; --card:#161b28; --card2:#1d2434;
+  --line:#232b3d; --txt:#e6ebf4; --sub:#8b94a7; --acc:#4f8cff; --acc2:#7db0ff;
+  --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:radial-gradient(1200px 600px at 80% -10%,#14213d 0%,var(--bg) 55%),var(--bg);
+  color:var(--txt); font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.5; overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{display:block}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#2a3448;border-radius:4px}
+
+/* ===== Header ===== */
+header{
+  position:sticky; top:0; z-index:50;
+  background:rgba(11,14,20,.85); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.head-inner{max-width:1100px;margin:auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
+.logo{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;white-space:nowrap}
+.logo .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--acc),#3ad0ff);display:flex;align-items:center;justify-content:center;font-size:15px}
+.search{flex:1;display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:30px;padding:4px 8px 4px 16px}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--txt);font-size:15px;padding:6px 0}
+.search input::placeholder{color:var(--sub)}
+.search button{background:linear-gradient(135deg,var(--acc),#3ad0ff);border:none;color:#fff;border-radius:24px;padding:7px 16px;font-size:14px;font-weight:600}
+.btn-ghost{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 12px;font-size:13px}
+.btn-ghost:active{transform:scale(.97)}
+
+/* ===== Category bar ===== */
+.cats{max-width:1100px;margin:auto;display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:7px 16px;border-radius:20px;background:var(--card);border:1px solid var(--line);font-size:14px;color:var(--sub);white-space:nowrap}
+.cat.on{background:linear-gradient(135deg,var(--acc),#3ad0ff);color:#fff;border-color:transparent}
+
+/* ===== Source tabs ===== */
+.sources{max-width:1100px;margin:auto;display:flex;align-items:center;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.sources::-webkit-scrollbar{display:none}
+.sources .label{font-size:12px;color:var(--sub);margin-right:4px;white-space:nowrap}
+.src{padding:5px 12px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--sub);white-space:nowrap}
+.src.on{color:var(--acc2);border-color:var(--acc)}
+.src .st{font-size:10px;color:#37d67a;margin-left:4px}
+
+/* ===== Grid ===== */
+.wrap{max-width:1100px;margin:auto;padding:12px 16px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}}
+.card{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--card);cursor:pointer;box-shadow:var(--shadow);transition:transform .15s}
+.card:active{transform:scale(.98)}
+.card .ph{position:relative;aspect-ratio:2/3;background:var(--card2);overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.card:hover .ph img{transform:scale(1.05)}
+.card .ph .rk{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);padding:2px 7px;border-radius:6px;font-size:11px;color:#ffd75e}
+.card .ph .srcTag{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.6);padding:2px 7px;border-radius:6px;font-size:10px;color:#fff}
+.card .tt{padding:8px 10px 10px}
+.card .tt .name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .tt .sub{font-size:11px;color:var(--sub);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loadmore{display:block;margin:24px auto 0;padding:11px 30px;background:var(--card);border:1px solid var(--line);color:var(--acc2);border-radius:24px;font-size:14px}
+
+/* ===== Loading & empty ===== */
+.msg{text-align:center;color:var(--sub);padding:50px 20px;font-size:14px}
+.spinner{width:34px;height:34px;margin:0 auto 12px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ===== Overlay / Detail ===== */
+.overlay{position:fixed;inset:0;z-index:80;background:rgba(5,8,13,.92);display:none;overflow-y:auto}
+.overlay.open{display:block}
+.detail{max-width:860px;margin:0 auto;padding:16px 16px 80px}
+.d-back{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--sub)}
+.d-head{display:flex;gap:18px;margin:16px 0 20px;flex-wrap:wrap}
+.d-poster{width:130px;flex-shrink:0}
+.d-poster img{width:100%;border-radius:12px;box-shadow:var(--shadow)}
+.d-info{flex:1;min-width:220px}
+.d-title{font-size:24px;font-weight:800;margin-bottom:6px}
+.d-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.d-meta span{font-size:12px;background:var(--card);border:1px solid var(--line);padding:3px 9px;border-radius:6px;color:var(--sub)}
+.d-desc{font-size:13px;color:var(--sub);line-height:1.7;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:18px;max-height:120px;overflow-y:auto}
+.d-sec{font-size:15px;font-weight:700;margin:6px 0 10px;display:flex;align-items:center;gap:8px}
+.d-sec::before{content:"";width:4px;height:16px;background:linear-gradient(var(--acc),#3ad0ff);border-radius:2px}
+.ply-from{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.ply-from button{padding:6px 14px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--sub)}
+.ply-from button.on{color:#fff;background:linear-gradient(135deg,var(--acc),#3ad0ff);border-color:transparent}
+.eps{display:flex;flex-wrap:wrap;gap:8px}
+.eps button{padding:8px 0;flex:0 0 64px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--txt);text-align:center}
+.eps button.on{background:var(--acc);color:#fff;border-color:transparent}
+
+/* ===== Player ===== */
+.player-box{margin-top:18px}
+.player-box video{width:100%;border-radius:12px;background:#000;box-shadow:var(--shadow);max-height:70vh}
+.vol{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--sub)}
+.vol input{flex:1}
+
+/* ===== Settings ===== */
+.settings{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+.settings h2{font-size:20px;margin-bottom:18px}
+.set-group{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.set-group h3{font-size:14px;color:var(--sub);margin-bottom:12px}
+.opt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.opt button{padding:7px 14px;border-radius:9px;background:var(--card2);border:1px solid var(--line);font-size:13px;color:var(--sub)}
+.opt button.on{color:#fff;background:linear-gradient(135deg,var(--acc),#3ad0ff);border-color:transparent}
+.set-group input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--txt);font-size:13px;outline:none}
+.set-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+.set-row input{flex:1}
+.set-row button{padding:9px 16px;border-radius:9px;background:var(--card2);border:1px solid var(--line);color:var(--sub);font-size:13px;white-space:nowrap}
+.src-list{margin-top:8px}
+.src-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--line);border-radius:9px;margin-bottom:6px;font-size:13px}
+.src-item .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-item code{font-size:10px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:45%}
+.src-item .del{color:#ff6b6b;background:none;border:none;font-size:16px;padding:0 6px}
+.hint{font-size:11px;color:var(--sub);line-height:1.7;margin-top:8px}
+
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1c2434;border:1px solid var(--line);padding:10px 18px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <div class="logo"><span class="dot">鲸</span><span>鲸鱼影视</span></div>
+    <div class="search">
+      <input id="kw" type="text" placeholder="搜索电影 / 电视剧 / 动漫…" autocomplete="off">
+      <button onclick="doSearch()">搜索</button>
+    </div>
+    <button class="btn-ghost" onclick="openSettings()">设置</button>
+  </div>
+</header>
+
+<div class="cats" id="cats"></div>
+<div class="sources" id="sources"></div>
+
+<div class="banner" id="proxyBanner" style="display:none;cursor:pointer;max-width:1100px;margin:12px auto 0;padding:12px 16px;border-radius:10px;background:#3a2f1a;border:1px solid #6b5a22;color:#ffd75e;font-size:13px;justify-content:space-between;align-items:center" onclick="openSettings()">
+  <span id="proxyBannerText"></span><b style="color:#fff;white-space:nowrap">去设置 →</b>
+</div>
+<main class="wrap">
+  <div id="msg"></div>
+  <div class="grid" id="grid"></div>
+  <button class="loadmore" id="loadMore" style="display:none" onclick="loadMore()">加载更多</button>
+</main>
+
+<!-- 详情/播放 -->
+<div class="overlay" id="detailOv">
+  <div class="detail" id="detailBody"></div>
+</div>
+
+<!-- 设置 -->
+<div class="overlay" id="settingsOv">
+  <div class="settings" id="settingsBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 配置 ================= */
+// 数据源：苹果CMS(maccms) 采集接口，可增删
+var DEFAULT_SOURCES = [
+  {name:"360资源", api:"https://360zy.com/api.php/provide/vod/"},
+  {name:"非凡影视", api:"https://cj.ffzyapi.com/api.php/provide/vod/"},
+  {name:"懒猪影视", api:"https://cj.lziapi.com/api.php/provide/vod/"},
+  {name:"电影天堂", api:"http://caiji.dyttzyapi.com/api.php/provide/vod/"}
+];
+// 分类（苹果CMS通用大类 type_id）
+var CATS = [
+  {id:0, name:"全部"},
+  {id:1, name:"电影"},
+  {id:2, name:"电视剧"},
+  {id:3, name:"综艺"},
+  {id:4, name:"动漫"}
+];
+
+var state = {
+  sources: JSON.parse(localStorage.getItem("jy_sources") || "null") || DEFAULT_SOURCES,
+  curSrc: parseInt(localStorage.getItem("jy_src") || "0"),
+  proxyMode: localStorage.getItem("jy_proxy") || "allorigins", // direct | allorigins | custom
+  customProxy: localStorage.getItem("jy_custom") || "",
+  cat: 0,
+  page: 1,
+  keyword: "",
+  vod: null,
+  playFromIdx: 0,
+  playEpiIdx: 0,
+  busy: false
+};
+
+/* ================= 数据请求 ================= */
+function apiUrl(api, params){
+  var url = api + "?" + params;
+  if(state.proxyMode === "direct") return url;
+  if(state.proxyMode === "allorigins") return "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+  return state.customProxy + (state.customProxy.indexOf("?")>=0?"&":"?") + "url=" + encodeURIComponent(url);
+}
+function getJson(params, srcIdx){
+  srcIdx = (srcIdx===undefined?state.curSrc:srcIdx);
+  var api = state.sources[srcIdx].api;
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 12000); // 12s 超时，避免卡死
+  return fetch(apiUrl(api, params), {headers:{"User-Agent":"Mozilla/5.0"}, signal:ctrl.signal})
+    .then(function(r){ clearTimeout(timer); return r.json(); })
+    .catch(function(e){
+      clearTimeout(timer);
+      if(e && e.name==="AbortError") throw new Error("请求超时（公共代理太慢/失效），请到「设置」配置自建代理");
+      throw new Error("请求失败: "+e.message+"。请到「设置」检查代理方式");
+    });
+}
+function vodToCard(v){
+  return '<div class="card" onclick="openDetail('+v.vod_id+')">'+
+    '<div class="ph"><img loading="lazy" src="'+(v.vod_pic||'')+'" onerror="this.src=\'data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 200 300&quot;><rect fill=&quot;%231d2434&quot; width=&quot;200&quot; height=&quot;300&quot;/></svg>\'">'+
+    '<span class="rk">'+(v.vod_remarks||"")+'</span>'+
+    '<span class="srcTag">'+state.sources[state.curSrc].name+'</span></div>'+
+    '<div class="tt"><div class="name">'+(v.vod_name||"")+'</div>'+
+    '<div class="sub">'+(v.type_name||v.vod_year||"")+'</div></div></div>';
+}
+
+/* ================= 首页 / 分类 / 搜索 ================= */
+function renderCats(){
+  var h="";
+  CATS.forEach(function(c){ h+='<div class="cat'+(state.cat===c.id?" on":"")+'" onclick="setCat('+c.id+')">'+c.name+'</div>'; });
+  document.getElementById("cats").innerHTML=h;
+}
+function renderSources(){
+  var h='<span class="label">数据源</span>';
+  state.sources.forEach(function(s,i){
+    h+='<div class="src'+(state.curSrc===i?" on":"")+'" onclick="setSrc('+i+')">'+s.name+'<span class="st">●</span></div>';
+  });
+  h+='<div class="src" onclick="openSettings()">+ 管理</div>';
+  document.getElementById("sources").innerHTML=h;
+}
+function setCat(id){ state.cat=id; state.page=1; renderCats(); load(true); }
+function setSrc(i){ state.curSrc=i; localStorage.setItem("jy_src",i); renderSources(); state.page=1; load(true); }
+function showMsg(html){ document.getElementById("msg").innerHTML=html; document.getElementById("grid").innerHTML=""; }
+function setLoading(){ showMsg('<div class="spinner"></div><div>加载中…</div>'); }
+function load(reset){
+  if(state.busy) return; state.busy=true;
+  if(reset){ state.page=1; setLoading(); }
+  var p="ac=list&pg="+(state.page-1)+"&pagesize=30";
+  if(state.cat!==0) p+="&t="+state.cat;
+  if(state.keyword) p="ac=detail&wd="+encodeURIComponent(state.keyword)+"&pagesize=30";
+  getJson(p).then(function(d){
+    state.busy=false;
+    var list=(d&&d.list)||[];
+    document.getElementById("msg").innerHTML="";
+    var grid=document.getElementById("grid");
+    var html=reset? list.map(vodToCard).join("") : grid.innerHTML+list.map(vodToCard).join("");
+    if(!list.length){ document.getElementById("msg").innerHTML='<div class="msg">没有更多了</div>'; }
+    grid.innerHTML=html;
+    document.getElementById("loadMore").style.display= list.length>=30?"block":"none";
+  }).catch(function(e){ state.busy=false; showMsg('<div class="msg">'+e.message+'<br><br><button class="loadmore" onclick="load(true)">重试</button></div>'); });
+}
+function loadMore(){ state.page++; load(false); }
+function doSearch(){
+  var kw=document.getElementById("kw").value.trim();
+  state.keyword=kw; state.cat=0; renderCats();
+  load(true);
+}
+
+/* ================= 详情 & 播放 ================= */
+function openDetail(id){
+  setLoading();
+  document.getElementById("detailOv").classList.add("open");
+  getJson("ac=detail&ids="+id).then(function(d){
+    var v=(d&&d.list&&d.list[0])||{};
+    state.vod=v; state.playFromIdx=0; state.playEpiIdx=0;
+    renderDetail();
+  }).catch(function(e){ document.getElementById("detailBody").innerHTML='<div class="msg">'+e.message+'</div>'; });
+}
+function parsePlay(v){
+  // vod_play_from: 多源用 $$$ 分隔; vod_play_url: 对应源用 $$$ 分隔, 源内集数用 # 分隔, 集名$地址
+  var froms=(v.vod_play_from||"").split("$$$").map(function(x){return x.trim();}).filter(Boolean);
+  var urls=(v.vod_play_url||"").split("$$$");
+  var groups=[];
+  froms.forEach(function(f,i){
+    var eps=(urls[i]||"").split("#").map(function(e){e=e.trim();var p=e.indexOf("$");return p>0?{n:e.slice(0,p),u:e.slice(p+1)}:null;}).filter(Boolean);
+    groups.push({from:f, eps:eps});
+  });
+  return groups;
+}
+function renderDetail(){
+  var v=state.vod, b=document.getElementById("detailBody");
+  var groups=parsePlay(v);
+  var esc=function(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");};
+  var fromBtns=groups.map(function(g,i){
+    return '<button class="'+(i===state.playFromIdx?"on":"")+'" onclick="setFrom('+i+')">'+esc(g.from)+' ('+g.eps.length+')</button>';
+  }).join("");
+  var epsHtml="";
+  var cur=groups[state.playFromIdx];
+  if(cur) epsHtml=cur.eps.map(function(e,i){
+    return '<button class="'+(i===state.playEpiIdx?"on":"")+'" onclick="playEpi('+i+')">'+esc(e.n)+'</button>';
+  }).join("");
+  b.innerHTML=
+    '<button class="d-back" onclick="closeDetail()">← 返回</button>'+
+    '<div class="d-head">'+
+      '<div class="d-poster"><img src="'+(v.vod_pic||"")+'" onerror="this.style.display=\'none\'"></div>'+
+      '<div class="d-info">'+
+        '<div class="d-title">'+esc(v.vod_name)+'</div>'+
+        '<div class="d-meta">'+
+          (v.vod_year?'<span>'+esc(v.vod_year)+'</span>':"")+
+          (v.vod_area?'<span>'+esc(v.vod_area)+'</span>':"")+
+          (v.vod_lang?'<span>'+esc(v.vod_lang)+'</span>':"")+
+          (v.type_name?'<span>'+esc(v.type_name)+'</span>':"")+
+          (v.vod_remarks?'<span>'+esc(v.vod_remarks)+'</span>':"")+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    (v.vod_director?'<div class="d-meta"><span>导演: '+esc(v.vod_director)+'</span></div>':"")+
+    (v.vod_actor?'<div class="d-meta"><span>主演: '+esc(v.vod_actor)+'</span></div>':"")+
+    (v.vod_blurb?'<div class="d-desc">'+esc(v.vod_blurb)+'</div>':"")+
+    (groups.length?'<div class="d-sec">播放源</div><div class="ply-from">'+fromBtns+'</div><div class="d-sec">选集</div><div class="eps">'+epsHtml+'</div>':'<div class="msg">该片源暂无播放地址</div>')+
+    '<div class="player-box" id="playerBox"></div>';
+  buildPlayer();
+}
+function setFrom(i){ state.playFromIdx=i; state.playEpiIdx=0; renderDetail(); }
+function playEpi(i){
+  state.playEpiIdx=i;
+  var groups=parsePlay(state.vod);
+  var cur=groups[state.playFromIdx];
+  if(!cur||!cur.eps[i]) return;
+  // 只更新选集高亮，不重建整个详情（避免死循环）
+  var eps=document.querySelectorAll('#detailBody .eps button');
+  for(var j=0;j<eps.length;j++){ eps[j].classList.toggle('on', j===state.playEpiIdx); }
+  buildPlayer();
+}
+function buildPlayer(){
+  var groups=parsePlay(state.vod);
+  var cur=groups[state.playFromIdx];
+  if(!cur||!cur.eps[state.playEpiIdx]) return;
+  var u=cur.eps[state.playEpiIdx].u;
+  var box=document.getElementById("playerBox");
+  var v=document.createElement("video"); v.controls=true; v.autoplay=true; v.playsinline=true;
+  box.innerHTML=""; box.appendChild(v);
+  setupHls(v,u);
+  var bar=document.createElement("div"); bar.className="vol";
+  bar.innerHTML='<span>音量</span><input type="range" min="0" max="1" step="0.05" value="1" oninput="this.previousElementSibling.previousElementSibling.volume=this.value">';
+  box.appendChild(bar);
+}
+/* 多CDN动态加载 hls.js（任一站可用即成功，都不行则回退原生） */
+function loadHls(cb){
+  if(window.Hls){ cb(); return; }
+  var cnds=[
+    "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js",
+    "https://unpkg.com/hls.js@1/dist/hls.min.js",
+    "https://cdn.staticfile.org/hls.js/1.5.13/hls.min.js",
+    "https://cdn.bootcdn.net/ajax/libs/hls.js/1.5.13/hls.min.js"
+  ];
+  var i=0;
+  function next(){
+    if(i>=cnds.length){ cb(); return; }
+    var s=document.createElement("script");
+    s.src=cnds[i++];
+    s.onload=function(){ cb(); };
+    s.onerror=next;
+    document.head.appendChild(s);
+  }
+  next();
+}
+function setupHls(video,url){
+  var isM3u8 = url.indexOf(".m3u8")>=0;
+  if(isM3u8 && window.Hls && Hls.isSupported()){
+    var h=new Hls({liveSyncDurationCount:3});
+    h.loadSource(url); h.attachMedia(video);
+    h.on(Hls.Events.MANIFEST_PARSED,function(){ video.play().catch(function(){}); });
+    h.on(Hls.Events.ERROR,function(e,data){ if(data&&data.fatal){ video.src=url; video.play().catch(function(){}); } });
+    return;
+  }
+  if(isM3u8 && !window.Hls){
+    loadHls(function(){ setupHls(video,url); });
+    return;
+  }
+  video.src=url;
+  video.play().catch(function(){});
+}
+function closeDetail(){ document.getElementById("detailOv").classList.remove("open"); }
+
+/* ================= 设置 ================= */
+function openSettings(){ document.getElementById("settingsOv").classList.add("open"); renderSettings(); }
+function closeSettings(){ document.getElementById("settingsOv").classList.remove("open"); renderSources(); }
+function renderSettings(){
+  var mode=[
+    {k:"allorigins", n:"公共代理 (不稳定, 不推荐)"},
+    {k:"direct", n:"直连 (源站放行CORS时才可用)"},
+    {k:"custom", n:"自建代理 (推荐: PHP 或 Cloudflare Worker)"}
+  ];
+  var b=document.getElementById("settingsBody");
+  var srcList=state.sources.map(function(s,i){
+    return '<div class="src-item"><span class="nm">'+s.name+'</span><code>'+s.api+'</code><button class="del" onclick="delSrc('+i+')">✕</button></div>';
+  }).join("");
+  b.innerHTML=
+    '<button class="d-back" onclick="closeSettings()">← 返回</button>'+
+    '<h2 style="margin-top:16px">设置</h2>'+
+    '<div class="set-group"><h3>跨域代理方式（解决浏览器拦截）</h3>'+
+      '<div class="opt">'+mode.map(function(m){return '<button class="'+(state.proxyMode===m.k?"on":"")+'" onclick="setProxy(\''+m.k+'\')">'+m.n+'</button>';}).join("")+'</div>'+
+      '<div id="customBox" style="display:'+(state.proxyMode==="custom"?"block":"none")+'">'+
+        '<input id="cp" placeholder="https://你的项目.vercel.app/api/proxy" value="'+state.customProxy+'">'+
+        '<div class="hint">填入你自己代理的地址（推荐）：<br>· Vercel 部署 → 填 <b>https://你的项目名.vercel.app/api/proxy</b>（本项目自带，最简单）<br>· 有服务器/宝塔 → 上传 proxy.php，填 <b>https://你的域名/proxy.php</b>（国内最快）<br>· Cloudflare Worker → 填 <b>https://xxx.workers.dev</b><br>程序会自动拼 &lt;代理地址&gt;?url=源地址</div>'+
+      '</div>'+
+      '<div class="hint" style="margin-top:6px">当前: '+mode.filter(function(m){return m.k===state.proxyMode;})[0].n+'</div>'+
+    '</div>'+
+    '<div class="set-group"><h3>数据源（苹果CMS采集接口）</h3>'+
+      srcList+
+      '<div class="set-row"><input id="newSrcApi" placeholder="https://域名/api.php/provide/vod/" style="flex:2"><input id="newSrcName" placeholder="名称" style="flex:1"><button onclick="addSrc()">添加</button></div>'+
+      '<div class="hint">格式统一为 <b>域名/api.php/provide/vod/</b>。可随时添加或删除源。</div>'+
+    '</div>'+
+    '<div style="text-align:center;margin-top:20px"><button class="loadmore" onclick="closeSettings()">完成</button></div>';
+}
+function setProxy(k){
+  state.proxyMode=k; localStorage.setItem("jy_proxy",k);
+  var cb=document.getElementById("customBox");
+  if(cb) cb.style.display=(k==="custom"?"block":"none");
+  renderSettings();
+}
+function addSrc(){
+  var api=document.getElementById("newSrcApi").value.trim();
+  var name=document.getElementById("newSrcName").value.trim();
+  if(!api) return toast("请填接口地址");
+  if(!/^https?:\/\//i.test(api)) api="https://"+api;
+  state.sources.push({name:name||("源"+(state.sources.length+1)), api:api});
+  saveSources(); renderSettings();
+}
+function delSrc(i){ state.sources.splice(i,1); if(state.curSrc>=state.sources.length)state.curSrc=0; saveSources(); renderSettings(); }
+function saveSources(){ localStorage.setItem("jy_sources", JSON.stringify(state.sources)); }
+
+function toast(msg){
+  var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  setTimeout(function(){ t.classList.remove("show"); },2200);
+}
+
+/* ================= init ================= */
+function showProxyHint(){
+  var b=document.getElementById("proxyBanner"), t=document.getElementById("proxyBannerText");
+  if(!b||!t) return;
+  if(state.proxyMode==="allorigins"){
+    t.textContent="⚠ 公共代理不稳定，加载可能失败/缓慢，强烈建议配置自建代理（proxy.php 或 Cloudflare Worker）";
+    b.style.display="flex";
+  } else if(state.proxyMode==="custom" && !state.customProxy){
+    t.textContent="⚠ 请先填写自建代理地址（proxy.php 或 Worker）";
+    b.style.display="flex";
+  } else b.style.display="none";
+}
+renderCats(); renderSources();
+showProxyHint();
+loadHls(function(){ load(true); });
+document.getElementById("kw").addEventListener("keydown",function(e){ if(e.key==="Enter")doSearch(); });
+</script>
+</body>
+</html>
